@@ -8,6 +8,7 @@ module NightKnocker
       def add_model_class(klass)
         @model_classes ||= []
         @model_classes << klass
+        @model_classes.uniq!
       end
 
       def model_classes

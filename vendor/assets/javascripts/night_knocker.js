@@ -1,2 +1,3 @@
 //= require knockout
-//= require sammy
+//= require knockout.mapping
+//= require night_knocker.model

@@ -1,0 +1,30 @@
+(function() {
+  var <%= @model_class.name %>,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  <%= @model_class.name %> = (function(_super) {
+    __extends(<%= @model_class.name %>, _super);
+
+    <%= @model_class.name %>.prototype.resource_name = '<%= @model_class.name.underscore %>';
+    <%= @model_class.name %>.prototype.resources_url = function() {return '/<%= @model_class.table_name %>';};
+    <%= @model_class.name %>.prototype.resource_url = function() {return '/<%= @model_class.table_name %>/' + this.id();};
+
+    function <%= @model_class.name %>(data) {
+      <%= @model_class.name %>.__super__.constructor.call(this, { 
+        <%= 
+          [].tap {|result|
+            @model_class.each_view_model_attributes do |attr_name, options|
+              result << "#{attr_name}: data && data['#{attr_name}'] ? data['#{attr_name}'] : #{options[:array] ? '[]' : 'null' }"
+            end
+          }.join(',')
+        %>
+      });
+      this.id = ko.observable(data && data.id ? data.id : null);
+    }
+
+    return <%= @model_class.name %>;
+  })(NightKnockerModel);
+  window.Nk<%= @model_class.name %> = <%= @model_class.name %>
+})();

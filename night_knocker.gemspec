@@ -12,8 +12,7 @@ Gem::Specification.new do |s|
   s.homepage    = ""
   s.summary     = "Summary of NightKnocker."
   s.description = "Description of NightKnocker."
-
-  s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
+  s.files = Dir["{lib,vendor}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
   s.test_files = Dir["test/**/*"]
 
 #   s.add_dependency "rails", "~> 3.2.16"
@@ -21,6 +20,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", "~> 4.0.4"
   s.add_dependency "railties", "~> 4.0.4"
+  s.add_dependency "jquery-rails"
 
   s.add_development_dependency "sqlite3"
 end
