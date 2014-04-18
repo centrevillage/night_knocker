@@ -19,6 +19,7 @@ window.NightKnockerModel = (function() {
       }
     }
     this.errors = ko.observable({});
+    this._destroy = ko.observable(false);
     this.reset_errors();
   }
 
@@ -76,7 +77,11 @@ window.NightKnockerModel = (function() {
   };
 
   NightKnockerModel.prototype.to_update_hash = function() {
-    return this.to_hash();
+    if (this._destroy()) {
+      return $.extend({ _destroy: this._destroy() }, this.to_hash());
+    } else {
+      return this.to_hash();
+    }
   };
 
   NightKnockerModel.prototype.create = function(callbacks) {

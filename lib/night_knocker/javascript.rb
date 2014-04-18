@@ -14,7 +14,6 @@ module NightKnocker
     end
 
     def setup
-      Rails.logger.info "[DEBUG] NightKnocker::Javascript.setup -call "
       @erb = ERB.new(File.read(File.expand_path('../templates/model.js.erb', __FILE__)))
     end
 
