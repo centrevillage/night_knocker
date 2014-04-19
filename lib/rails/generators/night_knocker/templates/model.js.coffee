@@ -1,6 +1,6 @@
 <% class_name = name.classify -%>
 class <%= class_name %> extends NightKnockerModel
-  resource_name: <%= name.underscore %>
+  resource_name: '<%= name.underscore %>'
   constructor: (data) ->
     super(data)
 
