@@ -14,9 +14,9 @@ NightKnockerModel = (function() {
   NightKnockerModel.prototype.field = function(name, initial_value) {
     this.data_keys.push(name);
     if (initial_value instanceof Array) {
-      this[k] = ko.observableArray(initial_value);
+      this[name] = ko.observableArray(initial_value);
     } else {
-      this[k] = ko.observable(initial_value);
+      this[name] = ko.observable(initial_value);
     }
   }
 
