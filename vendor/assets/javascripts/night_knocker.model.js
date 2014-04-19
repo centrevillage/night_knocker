@@ -15,7 +15,6 @@ NightKnockerModel = (function() {
         this.field(k, attributes[k])
       }
     }
-    this.id = ko.observable(attributes['id']);
     this.errors = ko.observable({});
     this._destroy = ko.observable(false);
     this.reset_errors();
