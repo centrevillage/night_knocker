@@ -1,5 +1,6 @@
 NightKnockerModel = (function() {
   function NightKnockerModel(attributes) {
+    this._computed_values = {};
     this._options = {};
     if (arguments.length > 1) {
       this._options = arguments[1];
@@ -37,6 +38,7 @@ NightKnockerModel = (function() {
       var key = keys[i];
       this[key] = ko.observable(ko.unwrap(this[key]));
     }
+    this._reset_computed();
   }
 
   NightKnockerModel.prototype.unobserve = function() {
@@ -66,6 +68,54 @@ NightKnockerModel = (function() {
     } else {
       this[name] = ko.observable(initial_value);
     }
+  }
+
+  NightKnockerModel.prototype.computed = function(name, func) {
+    var computed_param;
+    if (func instanceof Function) {
+      computed_param = {
+        read: this._strip_function(func.toString())[1]
+      }
+    } else {
+      // Writable computed
+      computed_param = {};
+      if (func['read'] instanceof Function) {
+        computed_param['read'] = this._strip_function(func.read.toString())[1];
+      }
+      if (func['write'] instanceof Function) {
+        var param_func = this._strip_function(func.write.toString());
+        computed_param['write_param_name'] = param_func[0];
+        computed_param['write'] = param_func[1];
+      }
+    }
+    this._computed_values[name] = computed_param;
+    this._reset_computed(name);
+  }
+
+  NightKnockerModel.prototype._strip_function = function(fun_str) {
+    return [fun_str.substring(fun_str.indexOf('(')+1, fun_str.indexOf(')')), fun_str.substring(fun_str.indexOf('{')+1, fun_str.lastIndexOf('}'))];
+  }
+
+  NightKnockerModel.prototype._reset_computed = function() {
+    if (arguments.length > 0) {
+      this._reset_computed_one(arguments[0]);
+    } else {
+      for (var k in this._computed_values) {
+        this._reset_computed_one(k);
+      }
+    }
+  }
+
+  NightKnockerModel.prototype._reset_computed_one = function(name) {
+    var values = this._computed_values[name];
+    var param = {owner: this};
+    if (values['read']) {
+      param['read'] = new Function(values['read']);
+    }
+    if (values['write']) {
+      param['write'] = new Function(values['write_param_name'], values['write']);
+    }
+    this[name] = ko.computed(param);
   }
 
   NightKnockerModel.prototype.set_errors = function(error_data) {
