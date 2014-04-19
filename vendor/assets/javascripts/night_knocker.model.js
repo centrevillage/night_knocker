@@ -1,9 +1,18 @@
 NightKnockerModel = (function() {
   function NightKnockerModel(attributes) {
-    var k, v;
+    this._options = {};
+    if (arguments.length > 1) {
+      this._options = arguments[1];
+    }
     this.data_keys = [];
-    for (k in attributes) {
-      this.field(k, attributes[k])
+    if (this._options['observe']) {
+      for (var k in attributes) {
+        this.observable(k, attributes[k])
+      }
+    } else {
+      for (var k in attributes) {
+        this.field(k, attributes[k])
+      }
     }
     this.id = ko.observable(attributes['id']);
     this.errors = ko.observable({});
@@ -11,7 +20,46 @@ NightKnockerModel = (function() {
     this.reset_errors();
   }
 
+  NightKnockerModel.prototype.is_observe = function(key) {
+    return this[key] instanceof Function;
+  }
+
+  NightKnockerModel.prototype.observe = function() {
+    var keys = this.data_keys;
+    if (arguments.length > 0) {
+      if (arguments[0] instanceof Array) {
+        keys = arguments[0];
+      } else {
+        keys = [arguments[0]];
+      }
+    }
+    for (var i = 0, len = keys.length; i < len; ++i) {
+      var key = keys[i];
+      this[key] = ko.observable(ko.unwrap(this[key]));
+    }
+  }
+
+  NightKnockerModel.prototype.unobserve = function() {
+    var keys = this.data_keys;
+    if (arguments.length > 0) {
+      if (arguments[0] instanceof Array) {
+        keys = arguments[0];
+      } else {
+        keys = [arguments[0]];
+      }
+    }
+    for (var i = 0, len = keys.length; i < len; ++i) {
+      var key = keys[i];
+      this[key] = ko.unwrap(this[key]);
+    }
+  }
+
   NightKnockerModel.prototype.field = function(name, initial_value) {
+    this.data_keys.push(name);
+    this[name] = initial_value;
+  }
+
+  NightKnockerModel.prototype.observable = function(name, initial_value) {
     this.data_keys.push(name);
     if (initial_value instanceof Array) {
       this[name] = ko.observableArray(initial_value);
@@ -21,11 +69,10 @@ NightKnockerModel = (function() {
   }
 
   NightKnockerModel.prototype.set_errors = function(error_data) {
-    var errors, k, v;
     if (error_data) {
-      errors = $.extend({}, this.errors());
-      for (k in error_data) {
-        v = error_data[k];
+      var errors = $.extend({}, this.errors());
+      for (var k in error_data) {
+        var v = error_data[k];
         errors[k] = v != null ? v : true;
       }
       return this.errors(errors);
@@ -33,11 +80,11 @@ NightKnockerModel = (function() {
   };
 
   NightKnockerModel.prototype.reset_errors = function() {
-    var key, new_hash, _i, _len, _ref;
-    new_hash = {};
+    var  _i, _len, _ref;
+    var new_hash = {};
     _ref = this.data_keys;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      key = _ref[_i];
+      var key = _ref[_i];
       new_hash[key] = null;
     }
     this.errors(new_hash);
@@ -51,19 +98,18 @@ NightKnockerModel = (function() {
   };
 
   NightKnockerModel.prototype.error_off = function(attr_name) {
-    var errors;
-    errors = $.extend({}, this.errors());
+    var errors = $.extend({}, this.errors());
     errors[attr_name] = false;
     return this.errors(errors);
   };
 
   NightKnockerModel.prototype.to_hash = function() {
-    var data, key, _i, _len, _ref;
-    data = {};
+    var _i, _len, _ref;
+    var data = {};
     data[this.resource_name] = {};
     _ref = this.data_keys;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      key = _ref[_i];
+      var key = _ref[_i];
       data[this.resource_name][key] = this[key]();
     }
     return ko.mapping.toJS(data);
