@@ -1,26 +1,23 @@
-window.NightKnockerModel = (function() {
+NightKnockerModel = (function() {
   function NightKnockerModel(attributes) {
     var k, v;
-    this.data_keys = (function() {
-      var _results;
-      _results = [];
-      for (k in attributes) {
-        v = attributes[k];
-        _results.push(k);
-      }
-      return _results;
-    })();
+    this.data_keys = [];
     for (k in attributes) {
-      v = attributes[k];
-      if (v instanceof Array) {
-        this[k] = ko.observableArray(v);
-      } else {
-        this[k] = ko.observable(v);
-      }
+      this.field(k, attributes[k])
     }
+    this.id = ko.observable(attributes['id']);
     this.errors = ko.observable({});
     this._destroy = ko.observable(false);
     this.reset_errors();
+  }
+
+  NightKnockerModel.prototype.field = function(name, initial_value) {
+    this.data_keys.push(name);
+    if (initial_value instanceof Array) {
+      this[k] = ko.observableArray(initial_value);
+    } else {
+      this[k] = ko.observable(initial_value);
+    }
   }
 
   NightKnockerModel.prototype.set_errors = function(error_data) {
@@ -194,6 +191,14 @@ window.NightKnockerModel = (function() {
         };
       })(this)
     });
+  };
+
+  NightKnockerModel.prototype.resource_url = function() {
+    return '/' + this.resource_name + '/' + this.id();
+  };
+
+  NightKnockerModel.prototype.resources_url = function() {
+    return '/' + this.resource_name.pluralize();
   };
 
   return NightKnockerModel;
