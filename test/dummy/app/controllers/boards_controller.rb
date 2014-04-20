@@ -4,19 +4,33 @@ class BoardsController < ApplicationController
   # GET /boards
   def index
     @boards = Board.all
+    respond_to do |format|
+      format.json {render json: @boards}
+      format.html {render}
+    end
   end
 
   # GET /boards/1
   def show
+    respond_to do |format|
+      format.json {render json: @board}
+    end
   end
 
   # GET /boards/new
   def new
     @board = Board.new
+    respond_to do |format|
+      format.json {render json: @board}
+    end
   end
 
   # GET /boards/1/edit
   def edit
+    @board = Board.find(params[:id])
+    respond_to do |format|
+      format.json {render json: @board}
+    end
   end
 
   # POST /boards

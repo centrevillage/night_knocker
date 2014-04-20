@@ -1,4 +1,5 @@
 class Board extends NightKnockerModel
+  resource_name: 'board'
   constructor: (data) ->
     super(data, {observe: true})
     @field('hoge', 1)

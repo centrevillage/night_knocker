@@ -159,7 +159,7 @@ NightKnockerModel = (function() {
     _ref = this.data_keys;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       var key = _ref[_i];
-      data[this.resource_name][key] = this[key]();
+      data[this.resource_name][key] = ko.unwrap(this[key]);
     }
     return ko.mapping.toJS(data);
   };
@@ -178,7 +178,7 @@ NightKnockerModel = (function() {
 
   NightKnockerModel.prototype.create = function(callbacks) {
     this.reset_errors();
-    $.ajax(this.resources_url(), {
+    $.ajax(this.create_url(), {
       method: 'post',
       dataType: 'json',
       data: ko.mapping.toJSON(this.to_create_hash()),
@@ -216,7 +216,7 @@ NightKnockerModel = (function() {
 
   NightKnockerModel.prototype.update = function(callbacks) {
     this.reset_errors();
-    $.ajax(this.resource_url(), {
+    $.ajax(this.update_url(), {
       method: 'put',
       dataType: 'json',
       data: ko.mapping.toJSON(this.to_update_hash()),
@@ -254,7 +254,7 @@ NightKnockerModel = (function() {
 
   NightKnockerModel.prototype.destroy = function(callbacks) {
     this.reset_errors();
-    $.ajax(this.resource_url(), {
+    $.ajax(this.destroy_url(), {
       method: 'delete',
       dataType: 'json',
       success: (function(_this) {
@@ -288,12 +288,24 @@ NightKnockerModel = (function() {
     });
   };
 
+  NightKnockerModel.prototype.update_url = function() {
+    return this.resource_url();
+  };
+
+  NightKnockerModel.prototype.create_url = function() {
+    return this.resources_url();
+  };
+
+  NightKnockerModel.prototype.destroy_url = function() {
+    return this.resource_url();
+  };
+
   NightKnockerModel.prototype.resource_url = function() {
-    return '/' + this.resource_name + '/' + this.id();
+    return '/' + this.resource_name + '/' + this.id() + '.json';
   };
 
   NightKnockerModel.prototype.resources_url = function() {
-    return '/' + this.resource_name.pluralize();
+    return '/' + this.resource_name.pluralize() + '.json';
   };
 
   return NightKnockerModel;
