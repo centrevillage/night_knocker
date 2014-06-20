@@ -55,18 +55,26 @@ NightKnockerModel = (function() {
     }
   }
 
-  NightKnockerModel.prototype.field = function(name, initial_value) {
-    this.data_keys.push(name);
-    this[name] = initial_value;
-  }
-
-  NightKnockerModel.prototype.observable = function(name, initial_value) {
-    this.data_keys.push(name);
+  NightKnockerModel.prototype._observable = function(name, initial_value) {
     if (initial_value instanceof Array) {
       this[name] = ko.observableArray(initial_value);
     } else {
       this[name] = ko.observable(initial_value);
     }
+  }
+
+  NightKnockerModel.prototype.field = function(name, initial_value, options) {
+    this.data_keys.push(name);
+    if ((this._options['observe'] && !(options && options['observe'] == false)) || (options && options['observe'] == true)) {
+      this._observable(name, initial_value);
+    } else {
+      this[name] = initial_value;
+    }
+  }
+
+  NightKnockerModel.prototype.observable = function(name, initial_value) {
+    this.data_keys.push(name);
+    this._observable(name, initial_value);
   }
 
   NightKnockerModel.prototype.computed = function(name, func) {
