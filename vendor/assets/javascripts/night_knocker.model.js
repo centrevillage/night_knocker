@@ -6,14 +6,8 @@ NightKnockerModel = (function() {
       this._options = arguments[1];
     }
     this.data_keys = [];
-    if (this._options['observe']) {
-      for (var k in attributes) {
-        this.observable(k, attributes[k])
-      }
-    } else {
-      for (var k in attributes) {
-        this.field(k, attributes[k])
-      }
+    for (var k in attributes) {
+      this.field(k, attributes[k])
     }
     this.errors = ko.observable({});
     this._destroy = ko.observable(false);
@@ -64,7 +58,9 @@ NightKnockerModel = (function() {
   }
 
   NightKnockerModel.prototype.field = function(name, initial_value, options) {
-    this.data_keys.push(name);
+    if ($.inArray(name, this.data_keys) == -1) {
+      this.data_keys.push(name);
+    }
     if ((this._options['observe'] && !(options && options['observe'] == false)) || (options && options['observe'] == true)) {
       this._observable(name, initial_value);
     } else {
