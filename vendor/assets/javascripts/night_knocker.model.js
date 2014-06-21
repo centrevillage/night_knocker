@@ -11,6 +11,7 @@ NightKnockerModel = (function() {
     }
     this.errors = ko.observable({});
     this._destroy = ko.observable(false);
+    this.parent = null; 
     this.reset_errors();
   }
 
@@ -57,19 +58,56 @@ NightKnockerModel = (function() {
     }
   }
 
+  NightKnockerModel.prototype._is_observable = function(options) {
+    return (this._options['observe'] && !(options && options['observe'] == false)) || (options && options['observe'] == true);
+  }
+
   NightKnockerModel.prototype.field = function(name, initial_value, options) {
     if ($.inArray(name, this.data_keys) == -1) {
       this.data_keys.push(name);
     }
-    if ((this._options['observe'] && !(options && options['observe'] == false)) || (options && options['observe'] == true)) {
+    if (this._is_observable(options)) {
       this._observable(name, initial_value);
     } else {
       this[name] = initial_value;
     }
   }
 
+  NightKnockerModel.prototype._set_model_field = function(name, value, options) {
+    if (options && options['field']) {
+      delete options['field'];
+      this.field(name, value, options)
+    } else {
+      if (this._is_observable(options))  {
+        this._observable(name, value)
+      } else {
+        this[name] = value;
+      }
+    }
+  }
+
+  NightKnockerModel.prototype.has_one = function(name, constructor, initial_value, options) {
+    var instance = new constructor(initial_value);
+    instance.parent = this;
+    this._set_model_field(name, instance, options);
+  }
+
+  NightKnockerModel.prototype.has_many = function(name, constructor, initial_value, options) {
+    if (!(initial_value instanceof Array)) {
+      throw 'initial_value is not instanceof Array.';
+    }
+    var arr = [];
+    var len = initial_value.length;
+    for (var i = 0; i < len; ++i) {
+      var v = initial_value[i];
+      var instance = new constructor(v);
+      instance.parent = this;
+      arr.push(instance);
+    }
+    this._set_model_field(name, arr, options);
+  }
+
   NightKnockerModel.prototype.observable = function(name, initial_value) {
-    this.data_keys.push(name);
     this._observable(name, initial_value);
   }
 
@@ -134,13 +172,13 @@ NightKnockerModel = (function() {
 
   NightKnockerModel.prototype.reset_errors = function() {
     var  _i, _len, _ref;
-    var new_hash = {};
+    var new_map = {};
     _ref = this.data_keys;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       var key = _ref[_i];
-      new_hash[key] = null;
+      new_map[key] = null;
     }
-    this.errors(new_hash);
+    this.errors(new_map);
   };
 
   NightKnockerModel.prototype.error_on = function(attr_name, msg) {
@@ -156,27 +194,50 @@ NightKnockerModel = (function() {
     return this.errors(errors);
   };
 
-  NightKnockerModel.prototype.to_hash = function() {
+  NightKnockerModel.prototype._to_map = function(value) {
+    var ret = null;
+    if (value instanceof NightKnockerModel) {
+      ret = value.to_map();
+    } else if (value instanceof Array) {
+      var arr = [];
+      var vlen = value.length;
+      for (var j = 0; j < vlen; ++j) {
+        arr.push(this._to_map(value[j]));
+      }
+      ret = arr;
+    } else {
+      ret = value;
+    }
+    return ret;
+  }
+
+  NightKnockerModel.prototype.to_map = function() {
     var _i, _len, _ref;
     var data = {};
-    data[this.resource_name] = {};
     _ref = this.data_keys;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       var key = _ref[_i];
-      data[this.resource_name][key] = ko.unwrap(this[key]);
+      var v = ko.unwrap(this[key]);
+      data[key] = this._to_map(v);
     }
     return ko.mapping.toJS(data);
   };
 
-  NightKnockerModel.prototype.to_create_hash = function() {
-    return this.to_hash();
+  NightKnockerModel.prototype.to_resource_map = function() {
+    var data = {}
+    data[this.resource_name] = this.to_map();
+    return data;
+  }
+
+  NightKnockerModel.prototype.to_create_map = function() {
+    return this.to_resource_map();
   };
 
-  NightKnockerModel.prototype.to_update_hash = function() {
+  NightKnockerModel.prototype.to_update_map = function() {
     if (this._destroy()) {
-      return $.extend({ _destroy: this._destroy() }, this.to_hash());
+      return $.extend({ _destroy: this._destroy() }, this.to_resource_map());
     } else {
-      return this.to_hash();
+      return this.to_resource_map();
     }
   };
 
@@ -185,7 +246,7 @@ NightKnockerModel = (function() {
     $.ajax(this.create_url(), {
       method: 'post',
       dataType: 'json',
-      data: ko.mapping.toJSON(this.to_create_hash()),
+      data: ko.mapping.toJSON(this.to_create_map()),
       contentType: "application/json",
       success: (function(_this) {
         return function(data) {
@@ -223,7 +284,7 @@ NightKnockerModel = (function() {
     $.ajax(this.update_url(), {
       method: 'put',
       dataType: 'json',
-      data: ko.mapping.toJSON(this.to_update_hash()),
+      data: ko.mapping.toJSON(this.to_update_map()),
       contentType: "application/json",
       success: (function(_this) {
         return function(data) {
