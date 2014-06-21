@@ -366,7 +366,7 @@ NightKnockerModel = (function() {
   };
 
   NightKnockerModel.prototype.resource_url = function() {
-    return '/' + this.resource_name + '/' + this.id() + '.json';
+    return '/' + this.resource_name.pluralize() + '/' + this.id() + '.json';
   };
 
   NightKnockerModel.prototype.resources_url = function() {
