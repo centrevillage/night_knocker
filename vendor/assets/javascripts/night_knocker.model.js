@@ -251,7 +251,7 @@ NightKnockerModel = (function() {
       success: (function(_this) {
         return function(data) {
           if (callbacks && callbacks['success']) {
-            callbacks['success']();
+            callbacks['success'](data);
           }
         };
       })(this),
@@ -262,7 +262,7 @@ NightKnockerModel = (function() {
             res = JSON.parse(xhr.responseText);
             _this.set_errors(res != null ? (_ref = res.errors) != null ? _ref.data : void 0 : void 0);
             if (callbacks && callbacks['error']) {
-              callbacks['error']();
+              callbacks['error'](xhr, status, error);
             }
           } catch (_error) {
             ex = _error;
@@ -272,7 +272,7 @@ NightKnockerModel = (function() {
       complete: (function(_this) {
         return function(xhr, status, error) {
           if (callbacks && callbacks['complete']) {
-            callbacks['complete']();
+            callbacks['complete'](xhr, status, error);
           }
         };
       })(this)
@@ -289,7 +289,7 @@ NightKnockerModel = (function() {
       success: (function(_this) {
         return function(data) {
           if (callbacks && callbacks['success']) {
-            callbacks['success']();
+            callbacks['success'](data);
           }
         };
       })(this),
@@ -300,7 +300,7 @@ NightKnockerModel = (function() {
             res = JSON.parse(xhr.responseText);
             _this.set_errors(res != null ? (_ref = res.errors) != null ? _ref.data : void 0 : void 0);
             if (callbacks && callbacks['error']) {
-              callbacks['error']();
+              callbacks['error'](xhr, status, error);
             }
           } catch (_error) {
             ex = _error;
@@ -310,7 +310,7 @@ NightKnockerModel = (function() {
       complete: (function(_this) {
         return function(xhr, status, error) {
           if (callbacks && callbacks['complete']) {
-            callbacks['complete']();
+            callbacks['complete'](xhr, status, error);
           }
         };
       })(this)
@@ -325,7 +325,7 @@ NightKnockerModel = (function() {
       success: (function(_this) {
         return function(data) {
           if (callbacks && callbacks['success']) {
-            callbacks['success']();
+            callbacks['success'](data);
           }
         };
       })(this),
@@ -336,7 +336,7 @@ NightKnockerModel = (function() {
             res = JSON.parse(xhr.responseText);
             _this.set_errors(res != null ? (_ref = res.errors) != null ? _ref.data : void 0 : void 0);
             if (callbacks && callbacks['error']) {
-              callbacks['error']();
+              callbacks['error'](xhr, status, error);
             }
           } catch (_error) {
             ex = _error;
@@ -346,7 +346,7 @@ NightKnockerModel = (function() {
       complete: (function(_this) {
         return function(xhr, status, error) {
           if (callbacks && callbacks['complete']) {
-            callbacks['complete']();
+            callbacks['complete'](xhr, status, error);
           }
         };
       })(this)
